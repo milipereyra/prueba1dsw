@@ -8,7 +8,7 @@ Class Pantalla{
     mostrarEventoSismico()
 }
 
-Class Gestor{
+Class Gestor{r
     nuevaRevision()
     buscarEventosSismicos()
     ordenarEventoSismico()
