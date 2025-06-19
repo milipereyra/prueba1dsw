@@ -4,11 +4,7 @@ hide circle
 Class Pantalla{
     btnCancelar
     btnConfirmar
-<<<<<<< HEAD
-    listEventosSismicos
-=======
     gridEventosSismicos
->>>>>>> f207d82 (Agregando atributos a Pantalla)
     opcRRES()
     abrirVentana()
     TomarSeleccionEventoSismico()
