@@ -2,6 +2,9 @@
 hide circle
 
 Class Pantalla{
+    btnCancelar
+    btnConfirmar
+    lblEventosSismicos
     opcRRES()
     abrirVentana()
     TomarSeleccionEventoSismico()
