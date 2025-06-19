@@ -1,0 +1,187 @@
+@startuml Diagramacaso23
+autonumber
+
+actor "__:AnalistaSismos__" as ASismos
+boundary "__PantallaDeRegistrarES__" as Pantalla
+control "__:GestorRevisionManual__" as Gestor
+entity "__:EventoSismico__" as ES #Coral
+entity "__actual:Estado__" as actualEstado
+entity "__:Estado__" as Estado #Coral
+entity "__Actual:Sesion__" as SesionActual 
+entity "__:Usuario__" as Usuario 
+entity "__Actual:EventoSismico__" as ActualES
+entity "__:CambioEstado__" as CambioEstado #Coral
+entity "__Actual:CambioEstado__" as CambioEstado2
+entity "__Nuevo:CambioEstado__" as NuevoCEstado 
+
+entity "__:AlcanceSismo__" as Alcance
+entity "__:ClasificacionSismo__" as CS
+entity "__:OrigendeGeneracion__" as OG
+entity "__:SerieTemporal__" as ST #Coral
+entity "__:MuestraSismica__" as MS
+entity "__:DetalleMuestraSismica__" as DMS 
+entity "__:TipoDeDato__" as TD
+entity "__:Sismografo__" as S #Coral
+entity "__Selec:Sismografo__" as SSeleccionado 
+entity "__:EstacionSismologica__" as EstacionSismologica
+entity "Generar Sismograma" as GenSis #LightBlue
+entity "__Rechazado:CambioEstado__" as CE2
+
+ASismos --> Pantalla**: opcRRES()
+
+Pantalla -> Pantalla: abrirVentana()
+
+Pantalla --> Gestor**: nuevaRevision()
+
+Gestor -> Gestor: buscarEventosSismicos()
+
+group loop [mientras existan eventos sismicos]
+    Gestor -> ES: existeEventoSismico()
+    ES -> actualEstado: esAutoDetectado()
+    Gestor -> ES: esPendienteRevision()
+    ES -> actualEstado: esPendienteRevision()
+    Gestor -> ES: getDatosPrincipales()
+    ES -> ES: getFechaHoradeOcurrencia()
+    ES -> ES: getLatitudEp()
+    ES -> ES: getLongitudEp()
+    ES -> ES: getLatitudHip()
+    ES -> ES: getLongHip()
+    ES -> ES: getMagnitud()
+end
+
+Gestor -> Gestor: ordenarEventoSismico()
+
+Gestor -> Pantalla: mostrarEventoSismico()
+
+ASismos -> Pantalla: TomarSeleccionEventoSismico()
+
+Pantalla -> Gestor: TomarSeleccionEventoSismico()
+
+'cuando hay cambio de estado lo primero que tiene que hacer el gestor es buscar la instancia nueva del estado
+
+Gestor -> Gestor: BuscarEstadoBloqueado()
+
+group loop [mientra haya Estados]
+    Gestor -> Estado: EsAtributoEventoSismico()
+    note right
+        Se coloca EsAmbitoEventoSismico para filtrar 
+        y saber si el estado corresponde a Evento Sismico
+    end note
+    Gestor -> Estado:  EsBloqueadoEnRevision()
+end
+
+Gestor -> Gestor: TomarFechaHoraActual()
+
+Gestor -> Gestor: BuscarEmpleado()
+
+'El gestor siempre tiene un puntero a la funcion actual por defecto asi que no se coloca
+
+Gestor -> SesionActual: ObtenerUsuarioLogueado
+
+SesionActual -> Usuario: getEmpleado()
+
+Gestor -> Gestor: bloquearEvento()
+
+Gestor-> Gestor: buscarCambioEstado()
+
+Gestor -> ActualES: revisar()
+
+ActualES -> ActualES: BuscarUltimoCambioEstado()
+
+ActualES -> CambioEstado: *esActual()
+
+ActualES -> CambioEstado2: setFechaHoraFin()
+
+ActualES ->  ActualES: bloquear()
+
+ActualES -> ActualES: CrearCambioEstado()
+
+ActualES --> NuevoCEstado**: new()
+
+Gestor -> Gestor: BuscarDatosEvento()
+
+Gestor -> ActualES: BuscarDatosEvento()
+
+ActualES -> Alcance: getNombre()
+
+ActualES -> CS: getNombre()
+
+ActualES -> OG: getNombre()
+
+Gestor -> Gestor: BuscarSerieEvento()
+
+Gestor -> ActualES: buscarSerieEvento()
+
+group loop Serie Temporal[Mientras haya series temporales]
+    ActualES -> ST: getDatos()
+    group loop MuestraSismica[Mientras haya Muestas Sismicas]
+        ST -> MS: getDatosMuetra()
+        group loop DetalleMuestras[Mientras haya Detalles de Muestras]
+            MS -> DMS: getDatos()
+            MS -> DMS: getTipoDato()
+            MS -> DMS: getDenominacion
+        end
+    end
+    group loop sismografo
+        ActualES --> S: eresMiSismografo()
+    end
+    ActualES -> SSeleccionado: BuscarEstacionSismologica()
+    SSeleccionado -> EstacionSismologica: getCodigoEstacion()
+end
+
+ActualES -> ActualES: ordenarPorEstacionSismologica
+
+Gestor -> Gestor: LlamarCasoDeUso()
+
+Gestor -> GenSis: <include>
+
+Gestor -> Pantalla: mostrarDatosEvento()
+
+Gestor -> Gestor: habilitarOpcionVisualizarMapa()
+
+Gestor -> Pantalla: MostrarSeleccionMostrarMapa()
+
+Gestor -> Gestor: habilitarOpcionModificarDatos()
+
+Gestor -> Pantalla: MostrarModificacionDatosSismo()
+
+
+Gestor -> Gestor: HabilitarOpcionesdeSeleccion() 
+
+Gestor -> Pantalla: pedirSeleccionDeAccion()
+
+ASismos -> Pantalla: tomarSeleccionRechazo()
+
+Pantalla -> Gestor: tomarSeleccionRechazo()
+
+Gestor -> Gestor: validarDatosMinimos()
+
+Gestor -> Gestor: actualizarEstadoEventoSismo()
+
+Gestor -> Gestor: tomarFechaHoraActual()
+
+group loop [mientra haya Estados]
+    Gestor -> Estado: EsAtributoEventoSismico()
+    Gestor -> Estado:  Esrechazado()
+end
+
+Gestor -> ActualES: Rechazar()
+
+ActualES -> ActualES: BuscarUltimoCambioEstado()
+
+ActualES -> CambioEstado: *esActual()
+
+ActualES -> CambioEstado2: setFechaHoraFin()
+
+ActualES ->  ActualES: rechazar()
+
+ActualES -> ActualES: CrearCambioEstado()
+
+ActualES --> CE2**: new()
+
+Gestor -> Gestor: finCU()
+
+
+
+
+@enduml
