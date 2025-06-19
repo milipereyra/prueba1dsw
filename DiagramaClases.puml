@@ -32,5 +32,10 @@ Class Estado{
     esPendienteRevision()
 }
 
+'Relaciones entre clases'
+Pantalla .left.> Gestor
+Gestor ..> Pantalla
+Gestor .up.> EventoSismico
+EventoSismico -right-> Estado: "1 Estado "
 
 @enduml
